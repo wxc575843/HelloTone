@@ -7,4 +7,5 @@ public class Global {
     public static final String HTTPIP = "http://172.29.83.51:8080/HelloToneWebService";
     public static final String PRACTICCATEGROYESERVLET = HTTPIP+"/servlet/PracticeCategroyServlet";
     public static final String REGISTERSERVLET = HTTPIP + "/servlet/RegisterSevlet";
+    public static final String LOGINSERVLET = HTTPIP + "/servlet/SigninServlet";
 }

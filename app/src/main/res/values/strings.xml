@@ -42,4 +42,11 @@
     <string name="register_failed_already_exist">Email already exist!</string>
     <string name="register_success">Welcome to HelloTone!</string>
 
+    <!-- Login -->
+    <string name="login_emial">Email</string>
+    <string name="login_password">Password</string>
+    <string name="login_btn">Login</string>
+    <string name="login_new">New to HelloTone? Register here!</string>
+    <string name="login_wrong">Email or Password Wrong!</string>
+
 </resources>
