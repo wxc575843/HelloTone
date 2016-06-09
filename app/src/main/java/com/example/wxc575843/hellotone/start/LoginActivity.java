@@ -307,7 +307,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         private final String mEmail;
         private final String mPassword;
-        private String url = "http://192.168.1.100:8080/HelloToneWebService/servlet/SigninServlet";
+        private String url = "http://192.168.1.116:8080/HelloToneWebService/servlet/SigninServlet";
         JSONParser jParser = new JSONParser();
         JSONObject json = new JSONObject();
         UserLoginTask(String email, String password) {

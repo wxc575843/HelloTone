@@ -1,6 +1,7 @@
 package com.example.wxc575843.hellotone.Practice;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -34,8 +35,8 @@ public class Practice extends Fragment {
         btn_life.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-
+                Intent intent = new Intent(getActivity(),Practice_select.class);
+                startActivity(intent);
             }
         });
 

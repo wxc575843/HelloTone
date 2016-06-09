@@ -27,4 +27,19 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="signin_failed">登录失败</string>
+
+    <!-- Register -->
+    <string name="register_email">Email</string>
+    <string name="register_nickname">Nickname</string>
+    <string name="register_password">Password</string>
+    <string name="register_repeat_password">Repeat Password</string>
+    <string name="register_gender">Choose your gender</string>
+    <string name="register_btn">Register New Account</string>
+    <string name="register_already">Already has account! Login here</string>
+    <string name="register_failed_sth_empty">Please complete all the information</string>
+    <string name="register_failed_password_diff">Password different twice</string>
+    <string name="register_failed_network">Network problem Register failed!</string>
+    <string name="register_failed_already_exist">Email already exist!</string>
+    <string name="register_success">Welcome to HelloTone!</string>
+
 </resources>
