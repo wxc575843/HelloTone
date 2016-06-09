@@ -48,5 +48,6 @@
     <string name="login_btn">Login</string>
     <string name="login_new">New to HelloTone? Register here!</string>
     <string name="login_wrong">Email or Password Wrong!</string>
+    <string name="title_activity_setting">SettingActivity</string>
 
 </resources>

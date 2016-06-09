@@ -1,5 +1,6 @@
 package com.example.wxc575843.hellotone.start;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -18,6 +19,7 @@ import com.example.wxc575843.hellotone.Community.Community;
 import com.example.wxc575843.hellotone.Culture.Culture;
 import com.example.wxc575843.hellotone.Practice.Practice;
 import com.example.wxc575843.hellotone.R;
+import com.example.wxc575843.hellotone.Settings.SettingActivity;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -102,8 +104,8 @@ public class MainActivity extends AppCompatActivity
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_layout,community).commit();
 
         } else if (id == R.id.nav_manage) {
-            Toast.makeText(MainActivity.this,"wait to develop", Toast.LENGTH_SHORT).show();
-
+            Intent intent = new Intent(MainActivity.this, SettingActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_share) {
             Toast.makeText(MainActivity.this,"wait to develop", Toast.LENGTH_SHORT).show();
 
