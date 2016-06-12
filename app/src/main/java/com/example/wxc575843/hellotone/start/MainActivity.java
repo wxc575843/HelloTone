@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.wxc575843.hellotone.Community.Community;
+import com.example.wxc575843.hellotone.Community.CommunityTest;
 import com.example.wxc575843.hellotone.Culture.Culture;
 import com.example.wxc575843.hellotone.Practice.Practice;
 import com.example.wxc575843.hellotone.R;
@@ -100,6 +101,8 @@ public class MainActivity extends AppCompatActivity
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_layout,culture).commit();
 
         } else if (id == R.id.nav_community) {
+//            Intent intent = new Intent(MainActivity.this, CommunityTest.class);
+//            startActivity(intent);
             Community community = new Community();
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_layout,community).commit();
 

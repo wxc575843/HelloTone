@@ -11,6 +11,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.wxc575843.hellotone.Practice.PracticeMain;
 import com.example.wxc575843.hellotone.R;
 import com.example.wxc575843.hellotone.utils.SharePreferenceUtils;
 import com.google.gson.Gson;
@@ -44,6 +45,9 @@ public class LoginActivity extends AppCompatActivity {
     @ViewInject(R.id.link_to_register)
     TextView tvLink2Register;
 
+    @ViewInject(R.id.develop)
+    Button btnDevelop;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,6 +64,14 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         btnLogin.setOnClickListener(loginLinster);
+
+        btnDevelop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     Button.OnClickListener loginLinster = new Button.OnClickListener() {

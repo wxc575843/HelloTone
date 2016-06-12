@@ -8,4 +8,6 @@ public class Global {
     public static final String PRACTICCATEGROYESERVLET = HTTPIP+"/servlet/PracticeCategroyServlet";
     public static final String REGISTERSERVLET = HTTPIP + "/servlet/RegisterSevlet";
     public static final String LOGINSERVLET = HTTPIP + "/servlet/SigninServlet";
+    public static final String COMMUNITYNEWSSERVLET = HTTPIP + "/servlet/CommunityNewsServlet";
+    public static final String COMMUNITYTOPNEWSSERVLET = HTTPIP + "/servlet/CommunityTopNewsServlet";
 }

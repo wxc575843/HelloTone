@@ -7,6 +7,15 @@ import java.util.List;
  */
 public class PracticeCategroy {
     String item;
+    List<String> urls;
+
+    public List<String> getUrls() {
+        return urls;
+    }
+
+    public void setUrls(List<String> urls) {
+        this.urls = urls;
+    }
 
     public String getItem() {
         return item;

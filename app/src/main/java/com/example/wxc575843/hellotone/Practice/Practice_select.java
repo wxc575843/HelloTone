@@ -1,5 +1,6 @@
 package com.example.wxc575843.hellotone.Practice;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -55,8 +56,7 @@ public class Practice_select extends AppCompatActivity {
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.d(TAG,position+"");
-
+                Intent intent = new Intent(Practice_select.this,PracticeMain.class);
             }
         });
     }
@@ -80,7 +80,6 @@ public class Practice_select extends AppCompatActivity {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            TextView tv = new TextView(Practice_select.this);
             String s = list.get(position).getItem();
             View v = null;
             //判断条目是否有缓存
