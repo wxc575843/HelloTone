@@ -102,11 +102,15 @@ public class LoginActivity extends AppCompatActivity {
                             SharePreferenceUtils.putString(LoginActivity.this,"gender",user.getGender());
                             SharePreferenceUtils.putString(LoginActivity.this,"country",user.getCountry());
                             SharePreferenceUtils.putString(LoginActivity.this,"chineseLevel",user.getChineseLevel());
-                            SharePreferenceUtils.putInt(LoginActivity.this,"level",user.getLevel());
-                            SharePreferenceUtils.putString(LoginActivity.this,"headPicture",user.getHeadPicture());
+                            SharePreferenceUtils.putInt(LoginActivity.this, "level", user.getLevel());
+                            SharePreferenceUtils.putString(LoginActivity.this, "headPicture", user.getHeadPicture());
                             SharePreferenceUtils.putInt(LoginActivity.this, "articleNum", user.getArticleNum());
                             SharePreferenceUtils.putInt(LoginActivity.this,"postNum",user.getPostNum());
                             SharePreferenceUtils.putInt(LoginActivity.this,"experience",user.getExperience());
+                            SharePreferenceUtils.putString(LoginActivity.this, "password", password);
+                            SharePreferenceUtils.putString(LoginActivity.this,"id",user.getId());
+
+                            SharePreferenceUtils.putBoolean(LoginActivity.this,"loginState",true);
 
                             Log.d(TAG,user.getChineseLevel());
 

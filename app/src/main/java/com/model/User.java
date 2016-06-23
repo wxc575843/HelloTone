@@ -4,6 +4,7 @@ package com.model;
  * Created by wxc575843 on 6/9/16.
  */
 public class User {
+    private String id;
     private int stateCode;
     private String nickName;
     private String email;
@@ -13,6 +14,14 @@ public class User {
     private String headPicture;
     private int articleNum;
     private int postNum;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public int getStateCode() {
         return stateCode;

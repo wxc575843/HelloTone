@@ -1,8 +1,10 @@
 package com.example.wxc575843.hellotone.start;
 
 import android.content.Intent;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
@@ -14,6 +16,8 @@ import com.example.wxc575843.hellotone.R;
 import com.example.wxc575843.hellotone.utils.SharePreferenceUtils;
 import com.lidroid.xutils.ViewUtils;
 import com.lidroid.xutils.view.annotation.ViewInject;
+
+import java.io.File;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -27,7 +31,7 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
         ViewUtils.inject(this);
-
+        CreateFiles();
         startAnim();
 
     }
@@ -63,11 +67,18 @@ public class SplashActivity extends AppCompatActivity {
             public void onAnimationEnd(Animation animation) {
                 boolean showed = SharePreferenceUtils.getBoolean(
                         SplashActivity.this, PREF_IS_USER_GUIDE_SHOWED, false);
+                boolean isLogin = SharePreferenceUtils.getBoolean(SplashActivity.this, "loginState", false);
 
                 if (showed) {
                     // 已经展示过, 进入主页面
-                    startActivity(new Intent(SplashActivity.this,
-                            LoginActivity.class));
+                    if (isLogin) {
+                        startActivity(new Intent(SplashActivity.this,
+                                MainActivity.class));
+                    } else {
+                        startActivity(new Intent(SplashActivity.this,
+                                LoginActivity.class));
+                    }
+
                 } else {
                     // 没展示, 进入新手引导页面
                     startActivity(new Intent(SplashActivity.this,
@@ -82,5 +93,20 @@ public class SplashActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    private void CreateFiles(){
+        String sDir = "";
+        String status = Environment.getExternalStorageState();
+        if (status.equals(Environment.MEDIA_MOUNTED)){
+            sDir = "/sdcard/HelloTone";
+        } else {
+            sDir = "/data/data/com.example.wxc575843.hellotone/HelloTone";
+        }
+        File destDir = new File(sDir);
+        if (!destDir.exists()){
+            destDir.mkdirs();
+        }
+        SharePreferenceUtils.putString(SplashActivity.this,"AppFilePath",sDir);
     }
 }

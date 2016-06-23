@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -21,6 +22,10 @@ import com.example.wxc575843.hellotone.Culture.Culture;
 import com.example.wxc575843.hellotone.Practice.Practice;
 import com.example.wxc575843.hellotone.R;
 import com.example.wxc575843.hellotone.Settings.SettingActivity;
+import com.example.wxc575843.hellotone.utils.SharePreferenceUtils;
+
+import java.io.File;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -52,6 +57,8 @@ public class MainActivity extends AppCompatActivity
 
         Practice practice = new Practice();
         getSupportFragmentManager().beginTransaction().add(R.id.fragment_layout,practice).commit();
+
+        CreateFiles();
     }
 
     @Override
@@ -110,7 +117,10 @@ public class MainActivity extends AppCompatActivity
             Intent intent = new Intent(MainActivity.this, SettingActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_share) {
-            Toast.makeText(MainActivity.this,"wait to develop", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+            SharePreferenceUtils.putBoolean(MainActivity.this,"loginState",false);
+            startActivity(intent);
+            finish();
 
         } else if (id == R.id.nav_send) {
             Toast.makeText(MainActivity.this,"wait to develop", Toast.LENGTH_SHORT).show();
@@ -120,5 +130,17 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void CreateFiles() {
+        String user = SharePreferenceUtils.getString(MainActivity.this, "email", null);
+        String path = SharePreferenceUtils.getString(MainActivity.this, "AppFilePath",null);
+        String voiceDir = path+"/"+user;
+        File destDir = new File(voiceDir);
+        if (!destDir.exists()){
+            destDir.mkdirs();
+            SharePreferenceUtils.putString(MainActivity.this, "VoiceFilePath", voiceDir);
+            Log.d("userFile",voiceDir);
+        }
     }
 }

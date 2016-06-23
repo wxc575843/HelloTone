@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +23,8 @@ import android.widget.Toast;
 
 import com.example.wxc575843.hellotone.R;
 import com.example.wxc575843.hellotone.utils.SharePreferenceUtils;
+import com.example.wxc575843.hellotone.Community.RefreshListView;
+import com.example.wxc575843.hellotone.Community.RefreshListView.RefreshListener;
 import com.github.mikephil.charting.charts.LineChart;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -29,16 +32,19 @@ import com.lidroid.xutils.BitmapUtils;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.ViewUtils;
 import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.RequestParams;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest;
 import com.lidroid.xutils.view.annotation.ViewInject;
+import com.model.Comment;
 import com.model.CommunityNews;
 import com.model.Global;
 import com.viewpagerindicator.CirclePageIndicator;
 
 import java.util.ArrayList;
 import java.util.List;
+
 
 
 /**
@@ -51,7 +57,7 @@ public class Community extends Fragment {
     List<CommunityNews> communityTopNewses;
     CirclePageIndicator mIndicator;
 
-    ListView lvNews;
+    RefreshListView lvNews;
     NewAdapter newAdapter;
     TopNewsAdapter newTopAdapter;
     HorizontalScrollViewPager mViewPager;
@@ -67,7 +73,7 @@ public class Community extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_community, container, false);
-        lvNews = (ListView) view.findViewById(R.id.community_lv_news);
+        lvNews = (RefreshListView) view.findViewById(R.id.community_lv_news);
         initViews();
         return view;
     }
@@ -91,6 +97,18 @@ public class Community extends Fragment {
         // set adapter
         lvNews.addHeaderView(headerView);
         lvNews.setAdapter(newAdapter);
+        lvNews.setOnRefreshListener(new RefreshListener() {
+
+            @Override
+            public void onRefresh() {
+                getNewsData();
+            }
+
+            @Override
+            public void onLoadMore() {
+                getMoreDataFromNet();
+            }
+        });
         lvNews.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -103,7 +121,7 @@ public class Community extends Fragment {
                     String ids = SharePreferenceUtils.getString(getActivity(),
                             "news_read_id", "");
 
-                    if (!ids.contains(news.getId()+"")) {// 只有在不包含该id时才添加
+                    if (!ids.contains(news.getId() + "")) {// 只有在不包含该id时才添加
                         ids = ids + news.getId() + ",";
                         SharePreferenceUtils.putString(getActivity(), "news_read_id", ids);// 更新已读id列表
                     }
@@ -113,8 +131,31 @@ public class Community extends Fragment {
 
                     Intent intent = new Intent(getActivity(), CommunityNewsDetail.class);
                     intent.putExtra("news_url", news.getContent());
+                    intent.putExtra("id", news.getId() + "");
+                    intent.putExtra("title",news.getTitle());
+                    Log.d("before", news.getId() + "");
                     startActivity(intent);
                 }
+            }
+        });
+    }
+
+    private void getMoreDataFromNet(){
+        HttpUtils httpUtils = new HttpUtils();
+        RequestParams params = new RequestParams();
+        params.addBodyParameter("num",communityNewses.size()+5+"");
+        httpUtils.send(HttpRequest.HttpMethod.POST, Global.COMMUNITYMORENEWS, params, new RequestCallBack<String>() {
+            @Override
+            public void onSuccess(ResponseInfo<String> responseInfo) {
+                Gson gson = new Gson();
+                communityNewses = gson.fromJson(responseInfo.result,new TypeToken<List<CommunityNews>>(){}.getType());
+                newAdapter.notifyDataSetChanged();
+                lvNews.onRefreshComplete(false);
+            }
+
+            @Override
+            public void onFailure(HttpException e, String s) {
+
             }
         });
     }
@@ -129,13 +170,16 @@ public class Community extends Fragment {
                 Gson gson = new Gson();
                 communityNewses = gson.fromJson(result, new TypeToken<List<CommunityNews>>() {
                 }.getType());
-                //Log.d("result", result);
+                Log.d("result", result);
                 newAdapter.notifyDataSetChanged();
+                lvNews.onRefreshComplete(true);
             }
 
             @Override
             public void onFailure(HttpException e, String s) {
                 Toast.makeText(getActivity(), "network failed", Toast.LENGTH_SHORT).show();
+                lvNews.onRefreshComplete(true);
+
             }
         });
     }
@@ -156,7 +200,8 @@ public class Community extends Fragment {
             @Override
             public void onSuccess(ResponseInfo<String> responseInfo) {
                 Gson gson = new Gson();
-                communityTopNewses = gson.fromJson(responseInfo.result,new TypeToken<List<CommunityNews>>(){}.getType());
+                communityTopNewses = gson.fromJson(responseInfo.result, new TypeToken<List<CommunityNews>>() {
+                }.getType());
                 newTopAdapter.notifyDataSetChanged();
                 //Log.d("result",responseInfo.result);
             }
@@ -186,6 +231,10 @@ public class Community extends Fragment {
         @Override
         public int getCount() {
             //Log.d("getCount", communityNewses.size() + "");
+            if (communityNewses==null){
+                Toast.makeText(getActivity(), "network failed please retry", Toast.LENGTH_SHORT).show();
+                return 0;
+            }
             return communityNewses.size();
         }
 
@@ -255,6 +304,9 @@ public class Community extends Fragment {
         @Override
         public int getCount() {
             //Log.d("TopNewCount",communityTopNewses.size()+"");
+            if (communityTopNewses==null){
+                return 0;
+            }
             return communityTopNewses.size();
         }
 
@@ -264,14 +316,27 @@ public class Community extends Fragment {
         }
 
         @Override
-        public Object instantiateItem(ViewGroup container, int position) {
+        public Object instantiateItem(ViewGroup container, final int position) {
             ImageView image = new ImageView(getActivity());
             image.setScaleType(ImageView.ScaleType.FIT_XY);// 设置图片展现样式为:
             // 宽高填充ImageView(图片可能被拉伸或者缩放)
             image.setImageResource(R.drawable.topnews_item_default);
             container.addView(image);
 
-            utils.display(image, Global.HTTPIP+communityTopNewses.get(position).getPicUrl());// 参1表示ImageView对象,
+            utils.display(image, Global.HTTPIP + communityTopNewses.get(position).getPicUrl());// 参1表示ImageView对象,
+            image.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    CommunityNews news = communityTopNewses.get(position);
+                    Intent intent = new Intent(getActivity(), CommunityNewsDetail.class);
+                    intent.putExtra("news_url", news.getContent());
+                    intent.putExtra("id", news.getId() + "");
+                    intent.putExtra("title",news.getTitle()+"");
+//                    Log.d("title+community",news.getTitle());
+                    Log.d("before", news.getId() + "");
+                    startActivity(intent);
+                }
+            });
             // 参2表示图片url
             //image.setOnTouchListener(new TopNewsTouchListener());
             return image;

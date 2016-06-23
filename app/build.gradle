@@ -39,4 +39,5 @@ dependencies {
     compile files('libs/TarsosDSP-Android-latest.jar')
     compile 'com.github.PhilJay:MPAndroidChart:v2.2.5'
     compile 'com.viewpagerindicator:library:2.4.1@aar'
+    compile 'com.github.jd-alexander:LikeButton:0.2.0'
 }

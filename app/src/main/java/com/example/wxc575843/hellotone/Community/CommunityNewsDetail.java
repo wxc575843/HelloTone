@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -12,14 +13,26 @@ import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.webkit.WebSettings.TextSize;
+import android.widget.Toast;
 
 import com.example.wxc575843.hellotone.R;
+import com.example.wxc575843.hellotone.utils.SharePreferenceUtils;
+import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.ViewUtils;
+import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.RequestParams;
+import com.lidroid.xutils.http.ResponseInfo;
+import com.lidroid.xutils.http.callback.RequestCallBack;
+import com.lidroid.xutils.http.client.HttpRequest;
 import com.lidroid.xutils.view.annotation.ViewInject;
+import com.like.LikeButton;
+import com.like.OnLikeListener;
+import com.model.Global;
 
 @SuppressWarnings("deprecation")
 public class CommunityNewsDetail extends AppCompatActivity implements View.OnClickListener {
@@ -30,8 +43,11 @@ public class CommunityNewsDetail extends AppCompatActivity implements View.OnCli
     @ViewInject(R.id.btn_text_size)
     private ImageButton btnTextSize;
 
-    @ViewInject(R.id.btn_share)
-    private ImageButton btnShare;
+//    @ViewInject(R.id.btn_share)
+//    private ImageButton btnShare;
+
+    @ViewInject(R.id.btn_news_to_comment)
+    private Button btn2Comment;
 
     @ViewInject(R.id.btn_back)
     private ImageButton btnBack;
@@ -48,11 +64,20 @@ public class CommunityNewsDetail extends AppCompatActivity implements View.OnCli
     @ViewInject(R.id.pb_news_detail)
     private ProgressBar mProgress;
 
+    @ViewInject(R.id.likebtn_commnitynews_detail)
+    private LikeButton likeButton;
+
+    @ViewInject(R.id.favourite_btn_commnitynews_detail)
+    private LikeButton btnFavourite;
+
+//    private ImageButton btnFavourite;
+
     private String mUrl;
+    private String title;
 
     private int mCurrentSizeIndex = -1;// 当前选择的字体
     private int mSelectedSizeIndex = 2;// 当前已选的字体, 默认是正常字体, 值为2
-
+    private String id="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +85,12 @@ public class CommunityNewsDetail extends AppCompatActivity implements View.OnCli
         setContentView(R.layout.activity_community_news_detail);
         ViewUtils.inject(this);
         mUrl = getIntent().getStringExtra("news_url");
-
+        id = getIntent().getStringExtra("id");
+        title = getIntent().getStringExtra("title");
+        Log.d("url",mUrl);
+        Log.d("title",title);
+        Log.d("begin",id);
+//        btnFavourite = (ImageButton) findViewById(R.id.btn_like);
         initView();
     }
 
@@ -71,7 +101,7 @@ public class CommunityNewsDetail extends AppCompatActivity implements View.OnCli
         btnMenu.setVisibility(View.GONE);
 
         btnTextSize.setOnClickListener(this);
-        btnShare.setOnClickListener(this);
+//        btnShare.setOnClickListener(this);
         btnBack.setOnClickListener(this);
 
         if (!TextUtils.isEmpty(mUrl)) {
@@ -93,6 +123,112 @@ public class CommunityNewsDetail extends AppCompatActivity implements View.OnCli
 
             mWebView.loadUrl(mUrl);
         }
+
+
+        initFavouriteBtn();
+
+
+
+
+        btn2Comment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(CommunityNewsDetail.this, CommentsActivity.class);
+                intent.putExtra("title", title);
+                intent.putExtra("id", id + "");
+                Log.d("title", title);
+                startActivity(intent);
+            }
+        });
+
+        initLikeBtn();
+
+
+    }
+
+    private void initFavouriteBtn() {
+
+        HttpUtils utils = new HttpUtils();
+        RequestParams params = new RequestParams();
+        params.addBodyParameter("state","view");
+        params.addBodyParameter("userId",SharePreferenceUtils.getString(CommunityNewsDetail.this,"id",null));
+        params.addBodyParameter("id",id+"");
+        utils.send(HttpRequest.HttpMethod.POST, Global.FAVOURITEARTICLESERVLET, params, new RequestCallBack<String>() {
+            @Override
+            public void onSuccess(ResponseInfo<String> responseInfo) {
+                if (responseInfo.result.equals("yes")) {
+                    btnFavourite.setLiked(true);
+
+                } else {
+                    btnFavourite.setLiked(false);
+                }
+            }
+
+            @Override
+            public void onFailure(HttpException e, String s) {
+
+            }
+        });
+
+        btnFavourite.setOnLikeListener(new OnLikeListener() {
+            @Override
+            public void liked(LikeButton likeButton) {
+                HttpUtils httpUtils = new HttpUtils();
+                RequestParams params = new RequestParams();
+                params.addBodyParameter("id", id);
+                params.addBodyParameter("state", "favourite");
+                params.addBodyParameter("userId", SharePreferenceUtils.getString(CommunityNewsDetail.this, "id", null));
+                httpUtils.send(HttpRequest.HttpMethod.POST, Global.FAVOURITEARTICLESERVLET, params, new RequestCallBack<String>() {
+                    @Override
+                    public void onSuccess(ResponseInfo<String> responseInfo) {
+                        int num = SharePreferenceUtils.getInt(CommunityNewsDetail.this,"articleNum",0);
+                        SharePreferenceUtils.putInt(CommunityNewsDetail.this,"articleNum",num+1);
+//                        if (responseInfo.result.equals("success")) {
+//                            Toast.makeText(CommunityNewsDetail.this, "收藏成功", Toast.LENGTH_SHORT).show();
+//                            int num = SharePreferenceUtils.getInt(CommunityNewsDetail.this, "articleNum", 0);
+//                            SharePreferenceUtils.putInt(CommunityNewsDetail.this, "articleNum", num + 1);
+//                        } else {
+//                            Toast.makeText(CommunityNewsDetail.this, "已收藏", Toast.LENGTH_SHORT).show();
+//                        }
+                    }
+
+                    @Override
+                    public void onFailure(HttpException e, String s) {
+                        Toast.makeText(CommunityNewsDetail.this, R.string.register_failed_network, Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public void unLiked(LikeButton likeButton) {
+                HttpUtils httpUtils = new HttpUtils();
+                RequestParams params = new RequestParams();
+                params.addBodyParameter("id", id);
+                Log.d("2333", id);
+                params.addBodyParameter("state", "unfavourite");
+                Log.d("2333", Global.FAVOURITEARTICLESERVLET);
+                params.addBodyParameter("userId", SharePreferenceUtils.getString(CommunityNewsDetail.this, "id", null));
+                httpUtils.send(HttpRequest.HttpMethod.POST, Global.FAVOURITEARTICLESERVLET, params, new RequestCallBack<String>() {
+                    @Override
+                    public void onSuccess(ResponseInfo<String> responseInfo) {
+                        int num = SharePreferenceUtils.getInt(CommunityNewsDetail.this,"articleNum",0);
+                        SharePreferenceUtils.putInt(CommunityNewsDetail.this,"articleNum",num-1);
+//                        if (responseInfo.result.equals("success")) {
+//                            Toast.makeText(CommunityNewsDetail.this, "收藏成功", Toast.LENGTH_SHORT).show();
+//                            int num = SharePreferenceUtils.getInt(CommunityNewsDetail.this, "articleNum", 0);
+//                            SharePreferenceUtils.putInt(CommunityNewsDetail.this, "articleNum", num + 1);
+//                        } else {
+//                            Toast.makeText(CommunityNewsDetail.this, "已收藏", Toast.LENGTH_SHORT).show();
+//                        }
+                    }
+
+                    @Override
+                    public void onFailure(HttpException e, String s) {
+                        Toast.makeText(CommunityNewsDetail.this, R.string.register_failed_network, Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
     }
 
     @Override
@@ -104,9 +240,9 @@ public class CommunityNewsDetail extends AppCompatActivity implements View.OnCli
             case R.id.btn_text_size:
                 showChangeSizeDialog();
                 break;
-            case R.id.btn_share:
-//                showShare();
-                break;
+//            case R.id.btn_share:
+////                showShare();
+//                break;
 
             default:
                 break;
@@ -200,4 +336,70 @@ public class CommunityNewsDetail extends AppCompatActivity implements View.OnCli
 //        oks.show(this);
 //    }
 
+
+    private void initLikeBtn(){
+
+        HttpUtils utils = new HttpUtils();
+        RequestParams params = new RequestParams();
+        params.addBodyParameter("isLike","view");
+        params.addBodyParameter("userId",SharePreferenceUtils.getString(CommunityNewsDetail.this,"id",null));
+        params.addBodyParameter("articleId",id+"");
+        utils.send(HttpRequest.HttpMethod.POST, Global.LIKEARTICLESERVLET, params, new RequestCallBack<String>() {
+            @Override
+            public void onSuccess(ResponseInfo<String> responseInfo) {
+                if (responseInfo.result.equals("yes")) {
+                    likeButton.setLiked(true);
+                } else {
+                    likeButton.setLiked(false);
+                }
+            }
+
+            @Override
+            public void onFailure(HttpException e, String s) {
+
+            }
+        });
+
+        likeButton.setOnLikeListener(new OnLikeListener() {
+            @Override
+            public void liked(LikeButton likeButton) {
+                HttpUtils utils = new HttpUtils();
+                RequestParams params = new RequestParams();
+                params.addBodyParameter("isLike", "like");
+                params.addBodyParameter("userId", SharePreferenceUtils.getString(CommunityNewsDetail.this, "id", null));
+                params.addBodyParameter("articleId", id + "");
+                utils.send(HttpRequest.HttpMethod.POST, Global.LIKEARTICLESERVLET, params, new RequestCallBack<String>() {
+                    @Override
+                    public void onSuccess(ResponseInfo<String> responseInfo) {
+
+                    }
+
+                    @Override
+                    public void onFailure(HttpException e, String s) {
+
+                    }
+                });
+            }
+
+            @Override
+            public void unLiked(LikeButton likeButton) {
+                HttpUtils utils = new HttpUtils();
+                RequestParams params = new RequestParams();
+                params.addBodyParameter("isLike", "unlike");
+                params.addBodyParameter("userId", SharePreferenceUtils.getString(CommunityNewsDetail.this, "id", null));
+                params.addBodyParameter("articleId", id + "");
+                utils.send(HttpRequest.HttpMethod.POST, Global.LIKEARTICLESERVLET, params, new RequestCallBack<String>() {
+                    @Override
+                    public void onSuccess(ResponseInfo<String> responseInfo) {
+
+                    }
+
+                    @Override
+                    public void onFailure(HttpException e, String s) {
+
+                    }
+                });
+            }
+        });
+    }
 }

@@ -9,6 +9,10 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!--往sdcard中写入数据的权限 -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
+    <!--在sdcard中创建/删除文件的权限 -->
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"></uses-permission>
 
     <application
         android:allowBackup="true"
@@ -45,7 +49,13 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".Practice.PracticeMain" />
         <activity android:name=".Community.CommunityTest" />
-        <activity android:name=".Community.CommunityNewsDetail"
+        <activity
+            android:name=".Community.CommunityNewsDetail"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".Settings.ModifyPassword" />
+        <activity android:name=".Settings.LikeArticle" />
+        <activity android:name=".Settings.LikeRecord" />
+        <activity android:name=".Community.CommentsActivity"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 

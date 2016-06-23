@@ -5,11 +5,11 @@
     android:orientation="vertical"
     tools:context=".Community.Community">
 
-    <ListView
+    <com.example.wxc575843.hellotone.Community.RefreshListView
         android:id="@+id/community_lv_news"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-    </ListView>
+    </com.example.wxc575843.hellotone.Community.RefreshListView>>
 
 </LinearLayout>

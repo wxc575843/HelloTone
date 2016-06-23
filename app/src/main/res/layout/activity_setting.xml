@@ -215,6 +215,7 @@
             android:layout_height="2dp"
             android:background="#7FD6D6D6" />
         <RelativeLayout
+            android:id="@+id/rv_like_article"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
@@ -223,7 +224,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:gravity="center"
-                android:text="文章数"
+                android:text="收藏的文章数"
                 android:textSize="20sp" />
             <TextView
                 android:id="@+id/setting_articleNum"
@@ -240,6 +241,7 @@
             android:layout_height="2dp"
             android:background="#7FD6D6D6" />
         <RelativeLayout
+            android:id="@+id/rv_like_record"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
@@ -248,18 +250,23 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:gravity="center"
-                android:text="贴子数"
+                android:text="收藏的record"
                 android:textSize="20sp" />
-            <TextView
-                android:id="@+id/setting_postNum"
-                android:layout_width="wrap_content"
-                android:layout_height="60dp"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:gravity="center"
-                android:paddingRight="15dp"
-                android:text="编程是最接近超能力的能力" />
+            <!--<TextView-->
+                <!--android:id="@+id/setting_postNum"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="60dp"-->
+                <!--android:layout_alignParentRight="true"-->
+                <!--android:layout_centerVertical="true"-->
+                <!--android:gravity="center"-->
+                <!--android:paddingRight="15dp"-->
+                <!--android:text="编程是最接近超能力的能力" />-->
         </RelativeLayout>
+        <Button
+            android:id="@+id/modify_password"
+            android:text="修改密码"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
     </LinearLayout>
 </ScrollView>
 

@@ -1,6 +1,11 @@
 package com.example.wxc575843.hellotone.Practice;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.view.PagerAdapter;
@@ -10,9 +15,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.example.wxc575843.hellotone.R;
+import com.example.wxc575843.hellotone.utils.SharePreferenceUtils;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
@@ -22,14 +30,25 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
+import com.lidroid.xutils.BitmapUtils;
+import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.ViewUtils;
+import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.RequestParams;
+import com.lidroid.xutils.http.ResponseInfo;
+import com.lidroid.xutils.http.callback.RequestCallBack;
+import com.lidroid.xutils.http.client.HttpRequest;
 import com.lidroid.xutils.view.annotation.ViewInject;
+import com.like.LikeButton;
+import com.like.OnLikeListener;
+import com.model.Global;
+import com.model.Record;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class PracticeMain extends AppCompatActivity implements UIHelper{
 
-    private int[] mImageIds = new int[]{R.drawable.explain,R.drawable.example};
     ArrayList<ImageView> mImageViewList;
     private LineChart mChart;
     private Thread audioThread;
@@ -43,14 +62,41 @@ public class PracticeMain extends AppCompatActivity implements UIHelper{
         }
     });
 
+    String id = "";
+    String picture="";
+    String example="";
+    String explain="";
+    String voiceFilePath="";
+    MediaPlayer mPlayer;
+
+    @ViewInject(R.id.practice_main_pinyin)
+    ImageView ivPinYin;
+
     @ViewInject(R.id.vp_practice_main)
     ViewPager vpPracticeMain;
+
+    @ViewInject(R.id.practice_main_btn_record)
+    ImageButton btnRecord;
+
+    @ViewInject(R.id.practice_main_btn_play)
+    ImageButton btnPlay;
+
+    @ViewInject(R.id.favourite_btn_practice)
+    LikeButton btnAdd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_practice_main);
         ViewUtils.inject(this);
+        id = getIntent().getStringExtra("id");
+        picture = getIntent().getStringExtra("picture");
+        example = getIntent().getStringExtra("example");
+        explain = getIntent().getStringExtra("explain");
+        voiceFilePath = getIntent().getStringExtra("filePath");
+        Log.d("id", getIntent().getStringExtra("id"));
+
+
         initChart();
         initViews();
 
@@ -96,20 +142,122 @@ public class PracticeMain extends AppCompatActivity implements UIHelper{
     }
 
     private void initViews(){
-        mImageViewList = new ArrayList<ImageView>();
-        for (int i = 0; i < mImageIds.length; ++i){
-            ImageView image = new ImageView(this);
-            image.setBackgroundResource(mImageIds[i]);
-            mImageViewList.add(image);
-        }
 
+        BitmapUtils utils = new BitmapUtils(PracticeMain.this);
+        utils.display(ivPinYin, Global.HTTPIP + picture);// 参1表示ImageView对象,
+        mImageViewList = new ArrayList<ImageView>();
+        ImageView image = new ImageView(this);
+        utils.display(image, Global.HTTPIP + explain);
+        mImageViewList.add(image);
+        Log.d("explian", Global.HTTPIP + explain);
+        utils.display(image, Global.HTTPIP + example);
+        Log.d("example", Global.HTTPIP + example);
+        mImageViewList.add(image);
+
+        initBtnAdd();
+
+        mPlayer = new MediaPlayer();
+        btnPlay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Uri myUri = Uri.parse(voiceFilePath);
+                Log.d("uri",myUri.toString());
+                mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                try {
+                    mPlayer.setDataSource(getApplicationContext(), myUri);
+                } catch (IllegalArgumentException e) {
+//                    Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_SHORT).show();
+                } catch (SecurityException e) {
+//                    Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_SHORT).show();
+                } catch (IllegalStateException e) {
+//                    Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_SHORT).show();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    mPlayer.prepare();
+                } catch (IllegalStateException e) {
+//                    Toast.makeText(getApplicationContext(), "You might not set the URI correctly!", Toast.LENGTH_SHORT).show();
+                } catch (IOException e) {
+//                    Toast.makeText(getApplicationContext(), "You might not set the URI correctly!", Toast.LENGTH_SHORT).show();
+                }
+                mPlayer.start();
+                Log.d("play", "yes");
+            }
+        });
+    }
+
+    private void initBtnAdd() {
+
+        HttpUtils utils = new HttpUtils();
+        RequestParams params = new RequestParams();
+        params.addBodyParameter("state","view");
+        params.addBodyParameter("userId",SharePreferenceUtils.getString(PracticeMain.this,"id",null));
+        params.addBodyParameter("recordid",id+"");
+        utils.send(HttpRequest.HttpMethod.POST, Global.RECORDLIKESERVLET, params, new RequestCallBack<String>() {
+            @Override
+            public void onSuccess(ResponseInfo<String> responseInfo) {
+                if (responseInfo.result.equals("yes")) {
+                    btnAdd.setLiked(true);
+                } else {
+                    btnAdd.setLiked(false);
+                }
+            }
+
+            @Override
+            public void onFailure(HttpException e, String s) {
+
+            }
+        });
+
+        btnAdd.setOnLikeListener(new OnLikeListener() {
+            @Override
+            public void liked(LikeButton likeButton) {
+                HttpUtils httpUtils = new HttpUtils();
+                RequestParams params = new RequestParams();
+                params.addBodyParameter("userId", SharePreferenceUtils.getString(PracticeMain.this, "id", null));
+                params.addBodyParameter("recordid", id);
+                params.addBodyParameter("state", "favourite");
+                httpUtils.send(HttpRequest.HttpMethod.POST, Global.RECORDLIKESERVLET, params, new RequestCallBack<String>() {
+                    @Override
+                    public void onSuccess(ResponseInfo<String> responseInfo) {
+
+                    }
+
+                    @Override
+                    public void onFailure(HttpException e, String s) {
+                        Toast.makeText(PracticeMain.this, R.string.register_failed_network, Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public void unLiked(LikeButton likeButton) {
+                HttpUtils httpUtils = new HttpUtils();
+                RequestParams params = new RequestParams();
+                params.addBodyParameter("userId", SharePreferenceUtils.getString(PracticeMain.this, "id", null));
+                params.addBodyParameter("recordid", id);
+                params.addBodyParameter("state", "unfavourite");
+                httpUtils.send(HttpRequest.HttpMethod.POST, Global.RECORDLIKESERVLET, params, new RequestCallBack<String>() {
+                    @Override
+                    public void onSuccess(ResponseInfo<String> responseInfo) {
+
+                    }
+
+                    @Override
+                    public void onFailure(HttpException e, String s) {
+                        Toast.makeText(PracticeMain.this, R.string.register_failed_network, Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
     }
 
     class PracticeMainPageAdapter extends PagerAdapter{
 
         @Override
         public int getCount() {
-            return mImageIds.length+1;
+            return 3;
         }
 
         @Override
@@ -120,9 +268,19 @@ public class PracticeMain extends AppCompatActivity implements UIHelper{
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
             if (position == 0){
+                ViewGroup v = (ViewGroup) mChart.getParent();
+                if(v!=null){
+                    v.removeView(mChart);
+                }
                 container.addView(mChart);
                 return mChart;
             }else {
+                Log.d("postion-1",position-1+"");
+                Log.d("size", mImageViewList.size() + "");
+                ViewGroup v = (ViewGroup) mImageViewList.get(position-1).getParent();
+                if(v!=null){
+                    v.removeView(mImageViewList.get(position-1));
+                }
                 container.addView(mImageViewList.get(position-1));
                 return mImageViewList.get(position-1);
             }

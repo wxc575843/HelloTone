@@ -2,7 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/title_red_bg" >
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/title_red_bg">
 
     <TextView
         android:id="@+id/tv_title"
@@ -51,12 +52,35 @@
             android:background="@android:color/transparent"
             android:src="@drawable/icon_textsize" />
 
-        <ImageButton
-            android:id="@+id/btn_share"
-            android:layout_width="wrap_content"
+        <!--<ImageButton-->
+            <!--android:id="@+id/btn_share"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:background="@android:color/transparent"-->
+            <!--android:src="@drawable/icon_share" />-->
+        <Button
+            android:id="@+id/btn_news_to_comment"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
-            android:src="@drawable/icon_share" />
+            android:background="@drawable/news_reply_post_btn_selector"
+            android:text="评论"/>
+        <!--<ImageButton-->
+            <!--android:id="@+id/btn_like"-->
+            <!--android:background="@drawable/icon_plus"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content" />-->
+        <com.like.LikeButton
+            app:icon_type="star"
+            app:icon_size="25dp"
+            android:id="@+id/favourite_btn_commnitynews_detail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <com.like.LikeButton
+            app:icon_type="thumb"
+            app:icon_size="25dp"
+            android:id="@+id/likebtn_commnitynews_detail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
     </LinearLayout>
 
     <ImageButton

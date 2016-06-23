@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <TextView
+        android:id="@+id/tv_comment_content"
+        android:text="comments"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="5dp"
+        android:singleLine="false"/>
+    <TextView
+        android:id="@+id/tv_comment_author"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:text="author"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="5dp"
+        android:layout_marginRight="10dp"/>
+    <TextView
+        android:id="@+id/tv_comment_date"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/tv_comment_author"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:text="date now"/>
+</RelativeLayout>
