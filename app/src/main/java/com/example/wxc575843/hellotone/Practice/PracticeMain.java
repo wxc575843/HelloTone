@@ -183,6 +183,28 @@ public class PracticeMain extends AppCompatActivity implements UIHelper{
                 }
                 mPlayer.start();
                 Log.d("play", "yes");
+                HttpUtils httpUtils = new HttpUtils();
+                RequestParams params = new RequestParams();
+                params.addBodyParameter("userId",SharePreferenceUtils.getString(PracticeMain.this,"id",null));
+                params.addBodyParameter("recordId",id+"");
+                httpUtils.send(HttpRequest.HttpMethod.POST, Global.LEARNRECORDSERVLET, params, new RequestCallBack<String>() {
+                    @Override
+                    public void onSuccess(ResponseInfo<String> responseInfo) {
+                        Log.d("exp+2333",responseInfo.result);
+                        if (responseInfo.result.equals("new")){
+                            int exp = SharePreferenceUtils.getInt(PracticeMain.this,"experience",0);
+                            SharePreferenceUtils.putInt(PracticeMain.this,"experience",exp+20);
+                            Log.d("exp+2333",exp+"");
+//                            int level = SharePreferenceUtils.getInt(PracticeMain.this,"level",0);
+                            SharePreferenceUtils.putInt(PracticeMain.this,"level",exp/100);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(HttpException e, String s) {
+
+                    }
+                });
             }
         });
     }

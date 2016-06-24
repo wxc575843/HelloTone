@@ -4,7 +4,7 @@ package com.model;
  * Created by wxc575843 on 6/7/16.
  */
 public class Global {
-    public static final String HTTPIP = "http://192.168.1.103:8080/HelloToneWebService";
+    public static final String HTTPIP = "http://172.29.105.107:8080/HelloToneWebService";
 
     public static final String VOICEDOWNLOADPATH = HTTPIP+"/voices";
 
@@ -24,5 +24,6 @@ public class Global {
     public static final String GETCOMMENTLISTSERVLET=HTTPIP+"/servlet/GetCommentListServlet";
     public static final String ADDCOMMENTSERVLET=HTTPIP+"/servlet/AddCommentServlet";
     public static final String LIKEARTICLESERVLET=HTTPIP+"/servlet/LikeArticleServlet";
+    public static final String LEARNRECORDSERVLET=HTTPIP+"/servlet/LearnRecordServlet";
 
 }

@@ -202,6 +202,7 @@ public class Community extends Fragment {
                 Gson gson = new Gson();
                 communityTopNewses = gson.fromJson(responseInfo.result, new TypeToken<List<CommunityNews>>() {
                 }.getType());
+                Log.d("topnews",responseInfo.result);
                 newTopAdapter.notifyDataSetChanged();
                 //Log.d("result",responseInfo.result);
             }

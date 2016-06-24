@@ -139,8 +139,9 @@ public class MainActivity extends AppCompatActivity
         File destDir = new File(voiceDir);
         if (!destDir.exists()){
             destDir.mkdirs();
-            SharePreferenceUtils.putString(MainActivity.this, "VoiceFilePath", voiceDir);
+
             Log.d("userFile",voiceDir);
         }
+        SharePreferenceUtils.putString(MainActivity.this, "VoiceFilePath", voiceDir);
     }
 }
